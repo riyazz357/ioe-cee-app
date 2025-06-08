@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Materials - IOE/CEE Prep</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .selection-card {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .selection-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .nav-card {
+            cursor: pointer;
+            margin-bottom: 1rem;
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .nav-card .card-header {
+            background-color: rgba(67, 97, 238, 0.1);
+            font-weight: 500;
+            border-bottom: none;
+        }
+        
+        .note-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            transition: all 0.2s ease;
+        }
+        
+        .note-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 1000;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .breadcrumb {
+            background-color: transparent;
+            padding: 0.75rem 0;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <!-- Breadcrumb Navigation -->
+        <nav id="breadcrumb" class="breadcrumb" style="display: none;">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#" id="bc-class">Class</a></li>
+            </ol>
+        </nav>
+        
+        <!-- Class Selection (Initial View) -->
+        <div id="classSelection" class="text-center">
+            <div class="selection-card">
+                <h3 class="mb-4"><i class="fas fa-graduation-cap me-2"></i>Select Your Class</h3>
+                <div class="d-grid gap-3">
+                    <button class="btn btn-primary btn-lg py-3 class-select" data-class="11">
+                        <i class="fas fa-arrow-circle-right me-2"></i>Class 11
+                    </button>
+                    <button class="btn btn-primary btn-lg py-3 class-select" data-class="12">
+                        <i class="fas fa-arrow-circle-right me-2"></i>Class 12
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Subject Selection -->
+        <div id="subjectSelection" style="display: none;">
+            <h3 class="mb-4 text-center" id="subjectSelectionTitle"></h3>
+            <div id="subjectsContainer" class="row"></div>
+        </div>
+        
+        <!-- Unit Selection -->
+        <div id="unitSelection" style="display: none;">
+            <h3 class="mb-4 text-center" id="unitSelectionTitle"></h3>
+            <div id="unitsContainer"></div>
+        </div>
+        
+        <!-- Chapter Selection -->
+        <div id="chapterSelection" style="display: none;">
+            <h3 class="mb-4 text-center" id="chapterSelectionTitle"></h3>
+            <div id="chaptersContainer"></div>
+        </div>
+        
+        <!-- Notes Display -->
+        <div id="notesDisplay" style="display: none;">
+            <h3 class="mb-4 text-center" id="notesDisplayTitle"></h3>
+            <div id="notesContainer"></div>
+        </div>
+        
+        <div id="loadingSpinner" class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading content...</p>
+        </div>
+    </div>
+    
+    <a href="#" id="backButton" class="btn btn-primary back-button rounded-circle shadow" style="display: none;">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample Data Structure
+        const studyData = {
+            class11: {
+                subjects: [
+                    {
+                        name: "Physics",
+                        icon: "fa-atom",
+                        units: [
+                            {
+                                name: "Mechanics",
+                                chapters: [
+                                    {
+                                        name: "Motion in Straight Line",
+                                        notes: [
+                                            { title: "Kinematics Basics", type: "pdf", url: "#", size: "2.1 MB" },
+                                            { title: "Velocity-Time Graphs", type: "video", url: "#", duration: "12:45" }
+                                        ]
+                                    },
+                                    {
+                                        name: "Newton's Laws",
+                                        notes: [
+                                            { title: "All Three Laws Explained", type: "pdf", url: "#", size: "3.4 MB" },
+                                            { title: "Problem Solving Techniques", type: "video", url: "#", duration: "18:20" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Thermodynamics",
+                                chapters: [
+                                    {
+                                        name: "Heat Transfer",
+                                        notes: [
+                                            { title: "Conduction, Convection, Radiation", type: "pdf", url: "#", size: "1.8 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Chemistry",
+                        icon: "fa-flask",
+                        units: [
+                            {
+                                name: "Atomic Structure",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Mathematics",
+                        icon: "fa-square-root-alt",
+                        units: [
+                            {
+                                name: "Atomic Structure",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Biology",
+                        icon: "fa-dna",
+                        units: [
+                            {
+                                name: "Atomic Structure",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+
+
+            // class 12 book start from here
+            class12: {
+                subjects: [
+                    {
+                        name: "Physics",
+                        icon: "fa-atom",
+                        units: [
+                            {
+                                name: "Electromagnetism",
+                                chapters: [
+                                    {
+                                        name: "Electrostatics",
+                                        notes: [
+                                            { title: "Coulomb's Law", type: "pdf", url: "#", size: "1.9 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Chemistry",
+                        icon: "fa-flask",
+                        units: [
+                            {
+                                name: "Atomic Structure",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Mathematics",
+                        icon: "fa-square-root-alt",
+                        units: [
+                            {
+                                name: "Algebra",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Trigonometry",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Analytics Geometry",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                            ,
+                            {
+                                name: "Vectors",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                            ,
+                            {
+                                name: "Statistics Probability",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                            ,
+                            {
+                                name: "Calculus",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                            ,
+                            {
+                                name: "Computational Methods or Mechanics",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                            
+
+                        ]
+                    },
+                    {
+                        name: "Biology",
+                        icon: "fa-dna",
+                        units: [
+                            {
+                                name: "Atomic Structure",
+                                chapters: [
+                                    {
+                                        name: "Quantum Numbers",
+                                        notes: [
+                                            { title: "Quantum Theory Basics", type: "pdf", url: "#", size: "2.5 MB" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+
+                ]
+            }
+        };
+
+        // Navigation State
+        let currentState = {
+            class: null,
+            subject: null,
+            unit: null,
+            chapter: null
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Class selection
+            document.querySelectorAll('.class-select').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentState.class = this.getAttribute('data-class');
+                    showSubjects();
+                });
+            });
+            
+            // Back button
+            document.getElementById('backButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                goBack();
+            });
+        });
+
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        function showSubjects() {
+            showLoading(true);
+            
+            setTimeout(() => {
+                // Hide class selection
+                document.getElementById('classSelection').style.display = 'none';
+                
+                // Update breadcrumb
+                document.getElementById('breadcrumb').style.display = 'block';
+                document.getElementById('bc-class').textContent = `Class ${currentState.class}`;
+                document.getElementById('breadcrumb').innerHTML = `
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#" id="bc-class">Class ${currentState.class}</a></li>
+                    </ol>
+                `;
+                
+                // Set title
+                document.getElementById('subjectSelectionTitle').innerHTML = `
+                    <i class="fas fa-graduation-cap me-2"></i>Class ${currentState.class} Subjects
+                `;
+                
+                // Load subjects
+                const container = document.getElementById('subjectsContainer');
+                container.innerHTML = '';
+                
+                const subjects = studyData[`class${currentState.class}`].subjects;
+                
+                subjects.forEach(subject => {
+                    const card = document.createElement('div');
+                    card.className = 'col-md-6 mb-3';
+                    card.innerHTML = `
+                        <div class="card nav-card" data-subject="${subject.name}">
+                            <div class="card-header">
+                                <i class="fas ${subject.icon} me-2"></i>
+                                ${subject.name}
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                // Add click handlers
+                document.querySelectorAll('.nav-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        currentState.subject = this.getAttribute('data-subject');
+                        showUnits();
+                    });
+                });
+                
+                // Show subject selection
+                document.getElementById('subjectSelection').style.display = 'block';
+                document.getElementById('backButton').style.display = 'flex';
+                showLoading(false);
+                
+                // Update breadcrumb click handler
+                document.getElementById('bc-class').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToClassSelection();
+                });
+            }, 500);
+        }
+
+        function showUnits() {
+            showLoading(true);
+            
+            setTimeout(() => {
+                // Hide previous views
+                document.getElementById('subjectSelection').style.display = 'none';
+                
+                // Update breadcrumb
+                document.getElementById('breadcrumb').innerHTML = `
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#" id="bc-class">Class ${currentState.class}</a></li>
+                        <li class="breadcrumb-item active" id="bc-subject">${currentState.subject}</li>
+                    </ol>
+                `;
+                
+                // Set title
+                document.getElementById('unitSelectionTitle').innerHTML = `
+                    <i class="fas ${getSubjectIcon()} me-2"></i>
+                    ${currentState.subject} Units
+                `;
+                
+                // Load units
+                const container = document.getElementById('unitsContainer');
+                container.innerHTML = '';
+                
+                const subject = studyData[`class${currentState.class}`].subjects.find(
+                    sub => sub.name === currentState.subject
+                );
+                
+                subject.units.forEach(unit => {
+                    const card = document.createElement('div');
+                    card.className = 'card nav-card mb-3';
+                    card.setAttribute('data-unit', unit.name);
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <i class="fas fa-cube me-2"></i>
+                            ${unit.name}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                // Add click handlers
+                document.querySelectorAll('.nav-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        currentState.unit = this.getAttribute('data-unit');
+                        showChapters();
+                    });
+                });
+                
+                // Show unit selection
+                document.getElementById('unitSelection').style.display = 'block';
+                showLoading(false);
+                
+                // Update breadcrumb click handlers
+                document.getElementById('bc-class').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToSubjectSelection();
+                });
+            }, 500);
+        }
+
+        function showChapters() {
+            showLoading(true);
+            
+            setTimeout(() => {
+                // Hide previous views
+                document.getElementById('unitSelection').style.display = 'none';
+                
+                // Update breadcrumb
+                document.getElementById('breadcrumb').innerHTML = `
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#" id="bc-class">Class ${currentState.class}</a></li>
+                        <li class="breadcrumb-item"><a href="#" id="bc-subject">${currentState.subject}</a></li>
+                        <li class="breadcrumb-item active" id="bc-unit">${currentState.unit}</li>
+                    </ol>
+                `;
+                
+                // Set title
+                document.getElementById('chapterSelectionTitle').innerHTML = `
+                    <i class="fas ${getSubjectIcon()} me-2"></i>
+                    ${currentState.unit} Chapters
+                `;
+                
+                // Load chapters
+                const container = document.getElementById('chaptersContainer');
+                container.innerHTML = '';
+                
+                const subject = studyData[`class${currentState.class}`].subjects.find(
+                    sub => sub.name === currentState.subject
+                );
+                
+                const unit = subject.units.find(u => u.name === currentState.unit);
+                
+                unit.chapters.forEach(chapter => {
+                    const card = document.createElement('div');
+                    card.className = 'card nav-card mb-3';
+                    card.setAttribute('data-chapter', chapter.name);
+                    card.innerHTML = `
+                        <div class="card-header">
+                            <i class="fas fa-book-open me-2"></i>
+                            ${chapter.name}
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+                
+                // Add click handlers
+                document.querySelectorAll('.nav-card').forEach(card => {
+                    card.addEventListener('click', function() {
+                        currentState.chapter = this.getAttribute('data-chapter');
+                        showNotes();
+                    });
+                });
+                
+                // Show chapter selection
+                document.getElementById('chapterSelection').style.display = 'block';
+                showLoading(false);
+                
+                // Update breadcrumb click handlers
+                document.getElementById('bc-class').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToSubjectSelection();
+                });
+                
+                document.getElementById('bc-subject').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToUnitSelection();
+                });
+            }, 500);
+        }
+
+        function showNotes() {
+            showLoading(true);
+            
+            setTimeout(() => {
+                // Hide previous views
+                document.getElementById('chapterSelection').style.display = 'none';
+                
+                // Update breadcrumb
+                document.getElementById('breadcrumb').innerHTML = `
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="#" id="bc-class">Class ${currentState.class}</a></li>
+                        <li class="breadcrumb-item"><a href="#" id="bc-subject">${currentState.subject}</a></li>
+                        <li class="breadcrumb-item"><a href="#" id="bc-unit">${currentState.unit}</a></li>
+                        <li class="breadcrumb-item active" id="bc-chapter">${currentState.chapter}</li>
+                    </ol>
+                `;
+                
+                // Set title
+                document.getElementById('notesDisplayTitle').innerHTML = `
+                    <i class="fas ${getSubjectIcon()} me-2"></i>
+                    ${currentState.chapter} Notes
+                `;
+                
+                // Load notes
+                const container = document.getElementById('notesContainer');
+                container.innerHTML = '';
+                
+                const subject = studyData[`class${currentState.class}`].subjects.find(
+                    sub => sub.name === currentState.subject
+                );
+                
+                const unit = subject.units.find(u => u.name === currentState.unit);
+                const chapter = unit.chapters.find(c => c.name === currentState.chapter);
+                
+                if (chapter.notes.length === 0) {
+                    container.innerHTML = `
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            No notes available for this chapter yet.
+                        </div>
+                    `;
+                } else {
+                    chapter.notes.forEach(note => {
+                        const noteItem = document.createElement('div');
+                        noteItem.className = 'note-item';
+                        noteItem.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="fas ${note.type === 'pdf' ? 'fa-file-pdf text-danger' : 'fa-video text-primary'} me-3"></i>
+                                    <strong>${note.title}</strong>
+                                    <div class="text-muted small mt-1">
+                                        ${note.type === 'pdf' ? 
+                                            `<i class="fas fa-file-alt me-1"></i> PDF • ${note.size}` : 
+                                            `<i class="fas fa-play-circle me-1"></i> Video • ${note.duration}`}
+                                    </div>
+                                </div>
+                                <a href="${note.url}" class="btn btn-sm ${note.type === 'pdf' ? 'btn-outline-danger' : 'btn-outline-primary'}" target="_blank">
+                                    ${note.type === 'pdf' ? '<i class="fas fa-download me-1"></i>Download' : '<i class="fas fa-play me-1"></i>Watch'}
+                                </a>
+                            </div>
+                        `;
+                        container.appendChild(noteItem);
+                    });
+                }
+                
+                // Show notes display
+                document.getElementById('notesDisplay').style.display = 'block';
+                showLoading(false);
+                
+                // Update breadcrumb click handlers
+                document.getElementById('bc-class').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToSubjectSelection();
+                });
+                
+                document.getElementById('bc-subject').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToUnitSelection();
+                });
+                
+                document.getElementById('bc-unit').addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToChapterSelection();
+                });
+            }, 500);
+        }
+
+        function getSubjectIcon() {
+            const subject = studyData[`class${currentState.class}`].subjects.find(
+                sub => sub.name === currentState.subject
+            );
+            return subject ? subject.icon : 'fa-book';
+        }
+
+        // Navigation functions
+        function goBack() {
+            if (currentState.chapter) {
+                resetToChapterSelection();
+            } else if (currentState.unit) {
+                resetToUnitSelection();
+            } else if (currentState.subject) {
+                resetToSubjectSelection();
+            } else if (currentState.class) {
+                resetToClassSelection();
+            }
+        }
+
+        function resetToClassSelection() {
+            currentState = { class: null, subject: null, unit: null, chapter: null };
+            document.getElementById('subjectSelection').style.display = 'none';
+            document.getElementById('unitSelection').style.display = 'none';
+            document.getElementById('chapterSelection').style.display = 'none';
+            document.getElementById('notesDisplay').style.display = 'none';
+            document.getElementById('breadcrumb').style.display = 'none';
+            document.getElementById('backButton').style.display = 'none';
+            document.getElementById('classSelection').style.display = 'block';
+        }
+
+        function resetToSubjectSelection() {
+            currentState.unit = null;
+            currentState.chapter = null;
+            document.getElementById('unitSelection').style.display = 'none';
+            document.getElementById('chapterSelection').style.display = 'none';
+            document.getElementById('notesDisplay').style.display = 'none';
+            document.getElementById('subjectSelection').style.display = 'block';
+        }
+
+        function resetToUnitSelection() {
+            currentState.chapter = null;
+            document.getElementById('chapterSelection').style.display = 'none';
+            document.getElementById('notesDisplay').style.display = 'none';
+            document.getElementById('unitSelection').style.display = 'block';
+        }
+
+        function resetToChapterSelection() {
+            document.getElementById('notesDisplay').style.display = 'none';
+            document.getElementById('chapterSelection').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Tests | IOE/CEE Prep</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+        }
+        
+        .exam-selection {
+            max-width: 800px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .exam-card {
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .exam-card.selected {
+            border-color: var(--primary-color);
+        }
+        
+        .exam-card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+        }
+        
+        .level-card {
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .level-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .level-card.selected {
+            border-color: var(--primary-color);
+        }
+        
+        .question-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .option-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .option-item:hover {
+            background-color: #e9ecef;
+        }
+        
+        .option-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background-color: var(--primary-color);
+            transition: width 0.5s ease;
+        }
+        
+        .result-card {
+            border-left: 5px solid var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar (same as index.html) -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-graduation-cap me-2"></i>IOE/CEE Prep
+            </a>
+        </div>
+    </nav>
+
+    <!-- Exam Selection Screen -->
+    <div class="container my-5" id="examSelectionScreen">
+        <div class="exam-selection text-center">
+            <h2 class="mb-4">Choose Your Exam</h2>
+            <p class="text-muted mb-4">Select between IOE or CEE entrance exam</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="exam-card" data-exam="ioe">
+                        <div class="exam-card-header">
+                            <h3><i class="fas fa-university me-2"></i>IOE Entrance</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Institute of Engineering Entrance Exam</p>
+                            <ul class="text-start">
+                                <li>2 hour duration</li>
+                                <li>100 multiple choice questions</li>
+                                <li>Physics, Chemistry, Math, English</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="exam-card" data-exam="cee">
+                        <div class="exam-card-header">
+                            <h3><i class="fas fa-graduation-cap me-2"></i>CEE Entrance</h3>
+                        </div>
+                        <div class="card-body">
+                            <p>Common Entrance Exam for Engineering</p>
+                            <ul class="text-start">
+                                <li>3 hour duration</li>
+                                <li>100 multiple choice questions</li>
+                                <li>Physics, Chemistry, Math, English</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Level Selection Screen (hidden initially) -->
+    <div class="container my-5 d-none" id="levelSelectionScreen">
+        <div class="exam-selection text-center">
+            <h2 class="mb-4">Choose Test Level</h2>
+            <p class="text-muted mb-4">Select difficulty level for your mock test</p>
+            
+            <div class="row g-4">
+                <div class="col-md-3">
+                    <div class="level-card p-3 text-center" data-level="basic">
+                        <h4>Basic</h4>
+                        <p>Fundamental concepts</p>
+                        <small class="text-muted">For beginners</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="level-card p-3 text-center" data-level="intermediate">
+                        <h4>Intermediate</h4>
+                        <p>Mixed difficulty</p>
+                        <small class="text-muted">For most students</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="level-card p-3 text-center" data-level="advanced">
+                        <h4>Advanced</h4>
+                        <p>Challenging problems</p>
+                        <small class="text-muted">For top scorers</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="level-card p-3 text-center" data-level="full-length">
+                        <h4>Full Length</h4>
+                        <p>Complete exam simulation</p>
+                        <small class="text-muted">Real exam experience</small>
+                    </div>
+                </div>
+            </div>
+            
+            <button id="startTestBtn" class="btn btn-primary mt-4" disabled>Start Test</button>
+        </div>
+    </div>
+
+    <!-- Test Screen (hidden initially) -->
+    <div class="container my-5 d-none" id="testScreen">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 id="testTitle">Mock Test</h2>
+            <div class="timer">02:00:00</div>
+        </div>
+        
+        <div class="progress-bar mb-4" id="testProgress"></div>
+        
+        <div class="question-container">
+            <div id="questionContainer">
+                <!-- Questions will be loaded here -->
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <button class="btn btn-outline-primary" id="prevQuestion">Previous</button>
+                <button class="btn btn-primary" id="nextQuestion">Next</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Result Screen (hidden initially) -->
+    <div class="container my-5 d-none" id="resultScreen">
+        <div class="card result-card">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Test Results</h2>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-center p-4">
+                            <h1 id="scoreDisplay" class="display-4 text-primary">0/100</h1>
+                            <p id="percentageDisplay" class="lead">0%</p>
+                            <div id="resultBadge" class="badge bg-primary mb-3">Beginner</div>
+                            <p id="timeTaken" class="text-muted">Time taken: 00:00:00</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h4 class="mb-3">Subject-wise Performance</h4>
+                        <div class="mb-3">
+                            <h6>Physics <span class="float-end" id="physicsScore">0/25</span></h6>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Chemistry <span class="float-end" id="chemistryScore">0/25</span></h6>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Mathematics <span class="float-end" id="mathScore">0/25</span></h6>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <h6>English <span class="float-end" id="englishScore">0/25</span></h6>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn btn-primary me-2" id="reviewTestBtn">Review Test</button>
+                    <button class="btn btn-outline-primary" id="newTestBtn">Take Another Test</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Test Configuration
+        const testConfig = {
+            ioe: {
+                duration: 7200, // 2 hours in seconds
+                totalQuestions: 100,
+                subjects: {
+                    physics: 25,
+                    chemistry: 25,
+                    math: 25,
+                    english: 25
+                }
+            },
+            cee: {
+                duration: 10800, // 3 hours in seconds
+                totalQuestions: 100,
+                subjects: {
+                    physics: 25,
+                    chemistry: 25,
+                    math: 25,
+                    english: 25
+                }
+            },
+            levels: {
+                basic: { difficulty: 'easy', numQuestions: 50 },
+                intermediate: { difficulty: 'medium', numQuestions: 75 },
+                advanced: { difficulty: 'hard', numQuestions: 100 },
+                'full-length': { difficulty: 'mixed', numQuestions: 100 }
+            }
+        };
+
+        // Current test state
+        let currentTest = {
+            examType: null,
+            level: null,
+            questions: [],
+            currentQuestionIndex: 0,
+            answers: {},
+            startTime: null,
+            endTime: null,
+            timerInterval: null
+        };
+
+        // DOM Elements
+        const examSelectionScreen = document.getElementById('examSelectionScreen');
+        const levelSelectionScreen = document.getElementById('levelSelectionScreen');
+        const testScreen = document.getElementById('testScreen');
+        const resultScreen = document.getElementById('resultScreen');
+        const examCards = document.querySelectorAll('.exam-card');
+        const levelCards = document.querySelectorAll('.level-card');
+        const startTestBtn = document.getElementById('startTestBtn');
+        const testTitle = document.getElementById('testTitle');
+        const timerDisplay = document.querySelector('.timer');
+        const testProgress = document.getElementById('testProgress');
+        const questionContainer = document.getElementById('questionContainer');
+        const prevQuestionBtn = document.getElementById('prevQuestion');
+        const nextQuestionBtn = document.getElementById('nextQuestion');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const percentageDisplay = document.getElementById('percentageDisplay');
+        const resultBadge = document.getElementById('resultBadge');
+        const timeTaken = document.getElementById('timeTaken');
+        const reviewTestBtn = document.getElementById('reviewTestBtn');
+        const newTestBtn = document.getElementById('newTestBtn');
+
+        // Event Listeners
+        examCards.forEach(card => {
+            card.addEventListener('click', function() {
+                examCards.forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                currentTest.examType = this.dataset.exam;
+                
+                // Update test title based on selection
+                const examName = currentTest.examType === 'ioe' ? 'IOE Entrance' : 'CEE Entrance';
+                document.querySelector('#levelSelectionScreen h2').textContent = `Choose ${examName} Test Level`;
+                
+                // Show level selection screen
+                examSelectionScreen.classList.add('d-none');
+                levelSelectionScreen.classList.remove('d-none');
+            });
+        });
+
+        levelCards.forEach(card => {
+            card.addEventListener('click', function() {
+                levelCards.forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+                currentTest.level = this.dataset.level;
+                startTestBtn.disabled = false;
+            });
+        });
+
+        startTestBtn.addEventListener('click', startTest);
+        prevQuestionBtn.addEventListener('click', showPreviousQuestion);
+        nextQuestionBtn.addEventListener('click', showNextQuestion);
+        reviewTestBtn.addEventListener('click', reviewTest);
+        newTestBtn.addEventListener('click', newTest);
+
+        // Functions
+        function startTest() {
+            currentTest.startTime = new Date();
+            currentTest.questions = generateTestQuestions();
+            
+            // Set test title
+            const examName = currentTest.examType === 'ioe' ? 'IOE' : 'CEE';
+            testTitle.textContent = `${examName} Mock Test - ${currentTest.level.charAt(0).toUpperCase() + currentTest.level.slice(1)}`;
+            
+            // Set timer
+            const duration = testConfig[currentTest.examType].duration;
+            currentTest.timeLeft = duration;
+            updateTimerDisplay();
+            
+            currentTest.timerInterval = setInterval(() => {
+                currentTest.timeLeft--;
+                updateTimerDisplay();
+                
+                if (currentTest.timeLeft <= 0) {
+                    clearInterval(currentTest.timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+            
+            // Show test screen
+            levelSelectionScreen.classList.add('d-none');
+            testScreen.classList.remove('d-none');
+            
+            // Load first question
+            loadQuestion(currentTest.currentQuestionIndex);
+        }
+
+        function generateTestQuestions() {
+            // In a real app, this would fetch from your database
+            // For demo, we'll generate sample questions
+            const numQuestions = testConfig.levels[currentTest.level].numQuestions;
+            const questions = [];
+            
+            for (let i = 0; i < numQuestions; i++) {
+                const subject = getSubjectForQuestion(i);
+                questions.push({
+                    id: i + 1,
+                    text: `Sample question ${i + 1} about ${subject} (${currentTest.level} level)`,
+                    options: ['Option A', 'Option B', 'Option C', 'Option D'],
+                    correctAnswer: Math.floor(Math.random() * 4),
+                    explanation: 'This is a sample explanation for the correct answer.',
+                    subject: subject
+                });
+            }
+            
+            return questions;
+        }
+
+        function getSubjectForQuestion(index) {
+            const subjects = Object.keys(testConfig[currentTest.examType].subjects);
+            let cumulative = 0;
+            
+            for (const subject of subjects) {
+                cumulative += testConfig[currentTest.examType].subjects[subject];
+                if (index < cumulative) {
+                    return subject;
+                }
+            }
+            
+            return subjects[0];
+        }
+
+        function loadQuestion(index) {
+            const question = currentTest.questions[index];
+            
+            questionContainer.innerHTML = `
+                <h4 class="mb-4">Question ${index + 1} of ${currentTest.questions.length}</h4>
+                <div class="question-text mb-4">
+                    <p class="lead">${question.text}</p>
+                </div>
+                <div class="options-container">
+                    ${question.options.map((option, i) => `
+                        <div class="option-item ${currentTest.answers[index] === i ? 'selected' : ''}" 
+                             data-option="${i}">
+                            ${String.fromCharCode(65 + i)}. ${option}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            
+            // Add event listeners to options
+            document.querySelectorAll('.option-item').forEach(option => {
+                option.addEventListener('click', function() {
+                    selectOption(index, parseInt(this.dataset.option));
+                });
+            });
+            
+            // Update navigation buttons
+            prevQuestionBtn.disabled = index === 0;
+            nextQuestionBtn.disabled = index === currentTest.questions.length - 1;
+            
+            // Update progress
+            updateProgress();
+        }
+
+        function selectOption(questionIndex, optionIndex) {
+            currentTest.answers[questionIndex] = optionIndex;
+            
+            // Update UI
+            document.querySelectorAll('.option-item').forEach((item, i) => {
+                if (i === optionIndex) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            // Update progress
+            updateProgress();
+        }
+
+        function showPreviousQuestion() {
+            if (currentTest.currentQuestionIndex > 0) {
+                currentTest.currentQuestionIndex--;
+                loadQuestion(currentTest.currentQuestionIndex);
+            }
+        }
+
+        function showNextQuestion() {
+            if (currentTest.currentQuestionIndex < currentTest.questions.length - 1) {
+                currentTest.currentQuestionIndex++;
+                loadQuestion(currentTest.currentQuestionIndex);
+            }
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(currentTest.timeLeft / 3600);
+            const minutes = Math.floor((currentTest.timeLeft % 3600) / 60);
+            const seconds = currentTest.timeLeft % 60;
+            
+            timerDisplay.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgress() {
+            const answeredCount = Object.keys(currentTest.answers).length;
+            const progress = (answeredCount / currentTest.questions.length) * 100;
+            testProgress.style.width = `${progress}%`;
+        }
+
+        function submitTest() {
+            clearInterval(currentTest.timerInterval);
+            currentTest.endTime = new Date();
+            
+            // Calculate score
+            let score = 0;
+            const subjectScores = {
+                physics: { correct: 0, total: testConfig[currentTest.examType].subjects.physics },
+                chemistry: { correct: 0, total: testConfig[currentTest.examType].subjects.chemistry },
+                math: { correct: 0, total: testConfig[currentTest.examType].subjects.math },
+                english: { correct: 0, total: testConfig[currentTest.examType].subjects.english }
+            };
+            
+            currentTest.questions.forEach((question, index) => {
+                if (currentTest.answers[index] === question.correctAnswer) {
+                    score++;
+                    subjectScores[question.subject].correct++;
+                }
+            });
+            
+            const percentage = Math.round((score / currentTest.questions.length) * 100);
+            
+            // Calculate time taken
+            const timeDiff = (currentTest.endTime - currentTest.startTime) / 1000; // in seconds
+            const hoursTaken = Math.floor(timeDiff / 3600);
+            const minutesTaken = Math.floor((timeDiff % 3600) / 60);
+            const secondsTaken = Math.floor(timeDiff % 60);
+            
+            // Display results
+            scoreDisplay.textContent = `${score}/${currentTest.questions.length}`;
+            percentageDisplay.textContent = `${percentage}%`;
+            
+            // Set result badge
+            if (percentage >= 80) {
+                resultBadge.textContent = "Excellent";
+                resultBadge.className = "badge bg-success mb-3";
+            } else if (percentage >= 60) {
+                resultBadge.textContent = "Good";
+                resultBadge.className = "badge bg-primary mb-3";
+            } else if (percentage >= 40) {
+                resultBadge.textContent = "Average";
+                resultBadge.className = "badge bg-warning mb-3";
+            } else {
+                resultBadge.textContent = "Needs Improvement";
+                resultBadge.className = "badge bg-danger mb-3";
+            }
+            
+            timeTaken.textContent = `Time taken: ${hoursTaken.toString().padStart(2, '0')}:${minutesTaken.toString().padStart(2, '0')}:${secondsTaken.toString().padStart(2, '0')}`;
+            
+            // Update subject-wise performance
+            document.getElementById('physicsScore').textContent = `${subjectScores.physics.correct}/${subjectScores.physics.total}`;
+            document.querySelector('#physicsScore + .progress .progress-bar').style.width = `${(subjectScores.physics.correct / subjectScores.physics.total) * 100}%`;
+            
+            document.getElementById('chemistryScore').textContent = `${subjectScores.chemistry.correct}/${subjectScores.chemistry.total}`;
+            document.querySelector('#chemistryScore + .progress .progress-bar').style.width = `${(subjectScores.chemistry.correct / subjectScores.chemistry.total) * 100}%`;
+            
+            document.getElementById('mathScore').textContent = `${subjectScores.math.correct}/${subjectScores.math.total}`;
+            document.querySelector('#mathScore + .progress .progress-bar').style.width = `${(subjectScores.math.correct / subjectScores.math.total) * 100}%`;
+            
+            document.getElementById('englishScore').textContent = `${subjectScores.english.correct}/${subjectScores.english.total}`;
+            document.querySelector('#englishScore + .progress .progress-bar').style.width = `${(subjectScores.english.correct / subjectScores.english.total) * 100}%`;
+            
+            // Show result screen
+            testScreen.classList.add('d-none');
+            resultScreen.classList.remove('d-none');
+        }
+
+        function reviewTest() {
+            // Reset to first question
+            currentTest.currentQuestionIndex = 0;
+            loadQuestion(0);
+            
+            // Show test screen in review mode
+            resultScreen.classList.add('d-none');
+            testScreen.classList.remove('d-none');
+            
+            // Disable timer in review mode
+            clearInterval(currentTest.timerInterval);
+            timerDisplay.textContent = "Review Mode";
+        }
+
+        function newTest() {
+            // Reset everything
+            currentTest = {
+                examType: null,
+                level: null,
+                questions: [],
+                currentQuestionIndex: 0,
+                answers: {},
+                startTime: null,
+                endTime: null,
+                timerInterval: null
+            };
+            
+            // Show exam selection screen
+            resultScreen.classList.add('d-none');
+            examSelectionScreen.classList.remove('d-none');
+            
+            // Reset selections
+            examCards.forEach(c => c.classList.remove('selected'));
+            levelCards.forEach(c => c.classList.remove('selected'));
+            startTestBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>
